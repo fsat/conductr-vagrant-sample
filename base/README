@@ -1,0 +1,7 @@
+Build a base image
+1. vagrant up
+2. vagrant package --output conductr-base.box
+3. vagrant add conductr-base conductr-base.box
+
+Reference:
+https://scotch.io/tutorials/how-to-create-a-vagrant-base-box-from-an-existing-one
