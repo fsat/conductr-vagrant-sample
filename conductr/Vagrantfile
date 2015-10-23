@@ -67,15 +67,42 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     sudo dpkg -i /vagrant/debs/conductr_0.1.0_all.deb
     sudo dpkg -i /usr/share/conductr/extra/conductr-haproxy_0.1.0_all.deb
-    sudo echo -Dconductr.ip=$(hostname -i)| sudo tee -a /usr/share/conductr/conf/application.ini
-    sudo echo -Dconductr-haproxy.ip=$(hostname -i) | sudo tee -a /usr/share/conductr-haproxy/conf/application.ini
-    sudo echo export CONDUCTR_IP=$(hostname -i) | sudo tee -a /etc/profile
     sudo chown conductr-haproxy:conductr-haproxy /etc/haproxy/haproxy.cfg
     sudo echo "conductr-haproxy ALL=(root) NOPASSWD: /etc/init.d/haproxy reload" | sudo tee -a /etc/sudoers
-    sudo echo '$ModLoad imtcp' | sudo tee -a /etc/rsyslog.d/conductr.conf
-    echo '$InputTCPServerRun 514' | sudo tee -a /etc/rsyslog.d/conductr.conf
-    sudo /etc/init.d/conductr restart
-    sudo /etc/init.d/conductr-haproxy restart
-    sudo /etc/init.d/rsyslog restart
   SHELL
+
+  config.vm.define "cond-0" do |cond0|
+    cond0.vm.network "private_network", ip: "192.168.33.10"
+    cond0.vm.provision "shell", inline: <<-SHELL
+      sudo echo -Dconductr.ip=192.168.33.10| sudo tee -a /usr/share/conductr/conf/application.ini
+      sudo echo -Dconductr-haproxy.ip=192.168.33.10 | sudo tee -a /usr/share/conductr-haproxy/conf/application.ini
+      sudo echo export CONDUCTR_IP=192.168.33.10 | sudo tee -a /etc/profile
+      sudo /etc/init.d/conductr restart
+      sudo /etc/init.d/conductr-haproxy restart
+    SHELL
+  end
+
+  config.vm.define "cond-1" do |cond1|
+    cond1.vm.network "private_network", ip: "192.168.33.11"
+    cond1.vm.provision "shell", inline: <<-SHELL
+      sudo echo -Dconductr.ip=192.168.33.11| sudo tee -a /usr/share/conductr/conf/application.ini
+      sudo echo -Dconductr-haproxy.ip=192.168.33.11 | sudo tee -a /usr/share/conductr-haproxy/conf/application.ini
+      sudo echo --seed 192.168.33.10:9004 | sudo tee -a /usr/share/conductr/conf/application.ini
+      sudo echo export CONDUCTR_IP=192.168.33.11 | sudo tee -a /etc/profile
+      sudo /etc/init.d/conductr restart
+      sudo /etc/init.d/conductr-haproxy restart
+    SHELL
+  end
+
+  config.vm.define "cond-2" do |cond2|
+    cond2.vm.network "private_network", ip: "192.168.33.12"
+    cond2.vm.provision "shell", inline: <<-SHELL
+      sudo echo -Dconductr.ip=192.168.33.12| sudo tee -a /usr/share/conductr/conf/application.ini
+      sudo echo -Dconductr-haproxy.ip=192.168.33.12 | sudo tee -a /usr/share/conductr-haproxy/conf/application.ini
+      sudo echo --seed 192.168.33.10:9004 | sudo tee -a /usr/share/conductr/conf/application.ini
+      sudo echo export CONDUCTR_IP=192.168.33.12 | sudo tee -a /etc/profile
+      sudo /etc/init.d/conductr restart
+      sudo /etc/init.d/conductr-haproxy restart
+    SHELL
+  end
 end
